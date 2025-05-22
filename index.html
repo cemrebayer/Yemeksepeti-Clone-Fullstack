@@ -1,0 +1,1713 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Yemeksepeti Clone - Admin & Restoran Paneli</title>
+<style>
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    margin: 0; background: #f7f7f7;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    color: #333;
+  }
+  header.app-header {
+    background: #EA004B;
+    color: white;
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+  }
+  header.app-header h1 {
+    margin:0;
+    font-size: 22px;
+    font-weight: 700;
+    cursor:pointer;
+  }
+  .header-center {
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+    padding: 0 20px;
+  }
+  #search-input {
+    width: 100%;
+    max-width: 400px;
+    padding: 8px 15px;
+    border-radius: 20px;
+    border: 1px solid #f78da7;
+    font-size: 14px;
+    outline: none;
+  }
+  #search-input:focus {
+    border-color: white;
+    box-shadow: 0 0 5px rgba(255,255,255,0.5);
+  }
+  .header-actions {
+    display: flex;
+    align-items: center;
+  }
+  .header-actions #user-info {
+    font-weight:500;
+    margin-right: 15px;
+    font-size: 14px;
+  }
+  .header-actions button, .header-actions a {
+    background-color: transparent;
+    color: white;
+    border: 1px solid white;
+    padding: 7px 12px;
+    border-radius: 20px;
+    text-decoration: none;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    margin-left: 8px;
+    transition: background-color 0.2s, color 0.2s;
+  }
+  .header-actions button#cart-button {
+    position: relative;
+  }
+  #cart-item-count {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background-color: #007bff;
+    color: white;
+    border-radius: 50%;
+    padding: 2px 6px;
+    font-size: 10px;
+    font-weight: bold;
+    display: none;
+  }
+  .header-actions button:hover, .header-actions a:hover {
+    background-color: white;
+    color: #EA004B;
+  }
+
+  .container {
+    max-width: 420px;
+    margin: 50px auto;
+    background: white;
+    padding: 30px 35px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  }
+  h2 {
+    margin-top: 0;
+    margin-bottom: 25px;
+    color: #EA004B;
+    text-align: center;
+    font-weight: 600;
+  }
+  input[type="text"], input[type="email"], input[type="password"], textarea, select {
+    width: 100%;
+    padding: 12px 15px;
+    margin-top: 8px;
+    margin-bottom: 18px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 15px;
+    box-sizing: border-box;
+    transition: border-color 0.2s;
+  }
+  input[type="text"]:focus, input[type="email"]:focus, input[type="password"]:focus, textarea:focus, select:focus {
+    border-color: #EA004B;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(234, 0, 75, 0.2);
+  }
+
+  button {
+    background: #EA004B;
+    color: white;
+    border: none;
+    padding: 12px;
+    width: 100%;
+    font-size: 16px;
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  button:hover {
+    background: #c70042;
+  }
+  button:disabled {
+    background: #cccccc;
+    cursor: not-allowed;
+  }
+  .toggle-link {
+    text-align: center;
+    margin-top: 20px;
+    cursor: pointer;
+    color: #EA004B;
+    font-weight: 500;
+    font-size: 14px;
+  }
+  .error, .success {
+    color: red;
+    margin-bottom: 15px;
+    padding: 10px 15px;
+    border-radius: 6px;
+    text-align: center;
+    font-size: 14px;
+  }
+  .success { color: #155724; background-color: #d4edda; border: 1px solid #c3e6cb; }
+  .error { color: #721c24; background-color: #f8d7da; border: 1px solid #f5c6cb; }
+
+  #main-app-content, #profile-page, #my-orders-page, #search-results-page, #restaurant-panel-page, #admin-panel-page, #courier-panel-page {
+    display: none;
+    flex-grow: 1;
+    padding: 20px;
+  }
+
+  main {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+  #restaurants, #menu, #search-results-restaurants, #search-results-menu-items {
+    flex: 1;
+    min-width: 280px;
+  }
+  #restaurants h2, #menu h2, #cart h2,
+  #search-results-page h2, #my-orders-page h2, #restaurant-panel-page h2, #admin-panel-page h2, #courier-panel-page h2 {
+    color: #333;
+    font-weight: 600;
+    border-bottom: 2px solid #f0f0f0;
+    padding-bottom: 10px;
+    margin-bottom: 15px;
+    font-size: 20px;
+  }
+   #admin-panel-page h3 {
+    color: #555;
+    font-size: 1.2em;
+    margin-top: 0;
+   }
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+  }
+  .restaurant-card, .menu-item-card {
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .restaurant-card:hover, .menu-item-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  }
+  .card-image {
+    width: 100%;
+    height: 160px;
+    object-fit: cover;
+    background-color: #f0f0f0;
+  }
+  .card-content {
+    padding: 15px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+  }
+  .card-content h3 {
+    margin: 0 0 8px;
+    color: #EA004B;
+    font-size: 18px;
+    cursor: pointer;
+  }
+  .card-content p {
+    margin: 0 0 5px;
+    font-size: 14px;
+    color: #555;
+    line-height: 1.4;
+  }
+  .card-content .price {
+    font-weight: bold;
+    color: #222;
+    font-size: 16px;
+    margin-top: auto;
+    margin-bottom: 10px;
+  }
+  .card-content button.add-to-cart-btn {
+    background: #28a745;
+    color: white;
+    padding: 9px 14px;
+    border-radius: 20px;
+    font-size: 14px;
+    min-width: 100px;
+    width: auto;
+    align-self: flex-start;
+    font-weight: 500;
+  }
+   .card-content button.add-to-cart-btn:hover { background: #218838; }
+
+  #menu {
+    flex: 2;
+    min-width: 320px;
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  }
+
+  #cart {
+    flex: 1;
+    min-width: 280px;
+    max-width: 380px;
+    background: white;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    padding: 20px;
+    border-radius: 10px;
+    align-self: flex-start;
+    position: sticky;
+    top: 80px;
+  }
+   @media (max-width: 1024px) {
+        #cart {
+            position: static;
+            margin-top: 20px;
+            width: 100%;
+            max-width: none;
+        }
+   }
+   @media (max-width: 768px) {
+        main { flex-direction: column; }
+        #restaurants, #menu, #cart { max-width: none; width: 100%; }
+        .header-center { display: none; }
+        header.app-header { padding: 10px 15px;}
+        header.app-header h1 { font-size: 20px; }
+        .header-actions button, .header-actions a { font-size: 12px; padding: 6px 10px; margin-left: 5px;}
+        .header-actions #user-info { margin-right: 10px; font-size: 13px;}
+   }
+
+  .cart-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    padding-bottom: 12px;
+    border-bottom: 1px dashed #eee;
+  }
+  .cart-item:last-child { border-bottom: none; }
+  .cart-item span.name-qty { flex: 1; font-size: 15px; }
+  .cart-item-controls { display: flex; gap: 6px; }
+  .cart-item button {
+    background: #EA004B; color: white; border-radius: 50%;
+    width: 28px; height: 28px; padding: 0; font-weight: bold;
+    font-size: 17px; line-height: 28px; text-align: center;
+  }
+  .cart-item button:hover { background: #c70042; }
+  #cart-total {
+    border-top: 2px solid #333; padding-top: 15px; margin-top: 15px;
+    font-size: 19px; font-weight: bold; text-align: right; color: #EA004B;
+  }
+  #checkout-button {
+    margin-top: 20px; background-color: #007bff; font-weight: 600;
+  }
+  #checkout-button:hover { background-color: #0056b3; }
+
+  #profile-page .container { max-width: 650px; }
+  #profile-page label {
+    display: block; margin-top: 18px; margin-bottom: 6px;
+    font-weight: 500; color: #444; font-size: 14px;
+  }
+  .form-section {
+    margin-bottom: 35px; padding-bottom: 25px; border-bottom: 1px solid #eee;
+  }
+  .form-section:last-child { border-bottom: none; margin-bottom: 0; }
+  .form-section h3 {
+    font-size: 18px; color: #EA004B; margin-bottom: 20px;
+    padding-bottom: 10px; border-bottom: 1px solid #f0f0f0;
+  }
+  #profile-message, #password-message { margin-top: 15px; }
+
+  #my-orders-page .order-card {
+    background: white; margin-bottom: 20px; padding: 20px;
+    border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  }
+  .order-card-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #eee;
+  }
+  .order-card-header img.restaurant-logo {
+    width: 50px; height: 50px; object-fit: contain; border-radius: 5px; margin-right: 15px;
+  }
+  .order-card-header .restaurant-info h3 { margin: 0; font-size: 18px; color: #EA004B;}
+  .order-card-header .restaurant-info { flex-grow: 1; }
+  .order-card-header .status {
+    font-weight: bold; padding: 5px 10px; border-radius: 15px; font-size: 13px;
+    text-transform: capitalize;
+  }
+  .status.hazirlaniyor, .status.hazırlanıyor { background-color: #ffc107; color: #333; } /* Added Turkish variant */
+  .status.yolda { background-color: #17a2b8; color: white; }
+  .status.teslim-edildi { background-color: #28a745; color: white; }
+  .status.iptal-edildi { background-color: #dc3545; color: white; }
+  .status.pending { background-color: #6c757d; color: white; }
+  .status.preparing { background-color: #ffc107; color: #333; }
+  .status.delivered { background-color: #28a745; color: white; }
+  .status.cancelled { background-color: #dc3545; color: white; }
+  .status.kuryeye-verildi { background-color: #17a2b8; color: white; } /* Added for courier status */
+
+
+  .order-card-body p { margin: 5px 0; font-size: 14px; color: #444;}
+  .order-items-list { margin-top: 15px; }
+  .order-items-list h4 { font-size: 15px; margin-bottom: 8px; color: #333;}
+  .order-item-detail {
+    display: flex; align-items: center; font-size: 13px;
+    padding: 8px 0; border-bottom: 1px dotted #eee;
+  }
+  .order-item-detail:last-child { border-bottom: none; }
+  .order-item-detail img.item-logo {
+    width: 35px; height: 35px; object-fit: cover; border-radius: 4px; margin-right: 10px;
+  }
+  .order-item-detail .name { flex-grow: 1; }
+  .order-item-detail .qty-price { color: #777; white-space: nowrap;}
+
+
+  #search-results-page .search-category { margin-bottom: 30px; }
+  #search-results-page .search-category h3 {
+    font-size: 18px; color: #555; margin-bottom: 15px;
+    border-bottom: 1px solid #ddd; padding-bottom: 8px;
+  }
+  .no-results {
+    text-align: center; color: #777; font-size: 16px; padding: 20px;
+  }
+
+  /* Restoran Paneli Stilleri */
+  #restaurant-panel-page h3 {
+      color: #555;
+      font-size: 1.1em;
+      margin-bottom: 10px;
+      border-bottom: none;
+  }
+  .restaurant-panel-order-card { /* Also used by Courier Panel */
+      background: white; margin-bottom: 20px; padding: 20px;
+      border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  }
+  .rp-order-header {
+      display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;
+  }
+  .rp-order-header strong { font-size: 1.1em; }
+  .rp-order-body p { margin: 5px 0; font-size: 0.95em; }
+  .rp-order-items h4 { margin-top: 15px; margin-bottom: 5px; font-size: 1em; }
+  .rp-order-item { font-size: 0.9em; color: #555; padding-left: 10px; }
+
+  .status-select {
+      padding: 8px 12px; border-radius: 5px; border: 1px solid #ccc;
+      background-color: #f8f9fa; font-size: 0.9em; margin-left: 10px;
+  }
+  .update-status-btn {
+      background-color: #007bff; color: white; padding: 8px 12px;
+      border: none; border-radius: 5px; cursor: pointer;
+      font-size: 0.9em; margin-left: 5px; width: auto;
+  }
+  .update-status-btn:hover { background-color: #0056b3; }
+  #select-restaurant-for-panel {
+      padding: 10px; margin-bottom: 20px; border-radius: 5px;
+      border: 1px solid #ddd; width: 100%; max-width: 400px; font-size: 1em;
+  }
+  #restaurant-selector-container { margin-bottom: 20px; }
+
+  /* Admin Paneli Stilleri */
+   #admin-panel-page h3 {
+    color: #555; font-size: 1.2em; margin-top: 0;
+   }
+  .admin-section {
+    margin-bottom: 30px; background-color: #fff; padding: 20px;
+    border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  }
+  .admin-table {
+    width: 100%; border-collapse: collapse; margin-top: 15px;
+  }
+  .admin-table th, .admin-table td {
+    border: 1px solid #ddd; padding: 10px; text-align: left; font-size: 0.9em;
+  }
+  .admin-table th { background-color: #f2f2f2; font-weight: 600; }
+  .admin-table tr:nth-child(even) { background-color: #f9f9f9; }
+  .admin-table tr:hover { background-color: #f1f1f1; }
+  .table-responsive { overflow-x: auto; }
+
+  footer {
+    text-align: center; padding: 20px; background-color: #333;
+    color: #ccc; font-size: 14px; margin-top: auto;
+  }
+</style>
+</head>
+<body>
+
+<div id="auth-container">
+    <header style="background: #EA004B; color: white; padding: 15px 20px; font-size: 24px; font-weight: bold; text-align:center;">Yemeksepeti Clone</header>
+    <div id="login-form" class="container">
+      <h2>Giriş Yap</h2>
+      <div id="login-error" class="error" style="display:none;"></div>
+
+      <label for="login-role">Giriş Türü:</label>
+      <select id="login-role">
+        <option value="customer">Kullanıcı</option>
+        <option value="restaurant_owner">Restoran Sahibi</option>
+        <option value="courier">Kurye</option>
+        <option value="admin">Admin</option>
+      </select>
+
+      <input type="email" id="login-email" placeholder="E-posta Adresiniz" />
+      <input type="password" id="login-password" placeholder="Şifreniz" />
+      <button onclick="login()">Giriş Yap</button>
+      <div class="toggle-link" onclick="showRegister()">Hesabınız yok mu? Hemen Üye Olun</div>
+    </div>
+
+
+    <div id="register-form" class="container" style="display:none;">
+      <h2>Üye Ol</h2>
+      <div id="register-error" class="error" style="display:none;"></div>
+
+      <label for="register-role">Kayıt Türü:</label>
+      <select id="register-role">
+        <option value="customer">Kullanıcı</option>
+        <!-- <option value="restaurant_owner">Restoran Sahibi</option> --> <!-- Disabled via JS -->
+        <option value="courier">Kurye</option>
+        <!-- <option value="admin">Admin</option> --> <!-- Admin registration should not be public -->
+      </select>
+
+      <input type="text" id="register-name" placeholder="Adınız Soyadınız" />
+      <input type="email" id="register-email" placeholder="E-posta Adresiniz" />
+      <input type="password" id="register-password" placeholder="Şifreniz (en az 6 karakter)" />
+      <button id="register-button" onclick="register()">Üye Ol</button>
+      <div class="toggle-link" onclick="showLogin()">Zaten üye misiniz? Giriş Yapın</div>
+    </div>
+</div>
+
+
+<header id="app-header-main" class="app-header" style="display:none;">
+  <h1 onclick="handleHeaderTitleClick()">Yemeksepeti</h1>
+  <div class="header-center">
+    <input type="search" id="search-input" placeholder="Restoran veya yemek ara..." onkeyup="handleSearchDebounced(event)">
+  </div>
+  <div class="header-actions">
+    <div id="user-info"></div>
+    <button id="admin-panel-btn" onclick="showAdminPanelPage()" style="display:none;">Admin Paneli</button>
+    <button id="my-orders-btn" onclick="showMyOrdersPage()" style="display:none;">Siparişlerim</button>
+    <button id="restaurant-panel-btn" onclick="showRestaurantPanelPage()" style="display:none;">Restoran Panelim</button>
+    <button id="courier-panel-btn" onclick="showCourierPanelPage()" style="display:none;">Kurye Panelim</button>
+    <button onclick="showProfilePage()">Profilim</button>
+    <button id="cart-button" onclick="toggleCartView()">
+        Sepet <span id="cart-item-count">0</span>
+    </button>
+    <button onclick="logout()">Çıkış Yap</button>
+  </div>
+</header>
+
+<div id="main-app-content">
+  <main>
+    <section id="restaurants">
+      <h2>Restoranlar</h2>
+      <div id="restaurant-list-grid" class="card-grid"></div>
+    </section>
+    <section id="menu">
+      <h2 id="menu-restaurant-name">Menü</h2>
+      <p id="menu-placeholder" style="display:block; text-align:center; color:#777;">Lütfen bir restoran seçiniz.</p>
+      <div id="menu-item-list-grid" class="card-grid"></div>
+    </section>
+    <aside id="cart" style="display:none;">
+      <h2>Sepetim</h2>
+      <div id="cart-items"></div>
+      <div id="cart-total">Toplam: 0.00₺</div>
+      <button id="checkout-button" onclick="placeOrder()">Siparişi Ver</button>
+      <div id="order-message" class="success" style="display:none; margin-top:15px;"></div>
+    </aside>
+  </main>
+</div>
+
+<div id="search-results-page" style="display:none;">
+    <h2 id="search-query-display">Arama Sonuçları</h2>
+    <div class="search-category">
+        <h3>Bulunan Restoranlar</h3>
+        <div id="search-results-restaurants" class="card-grid"></div>
+        <p id="no-restaurant-results" class="no-results" style="display:none;">Bu kritere uygun restoran bulunamadı.</p>
+    </div>
+    <div class="search-category">
+        <h3>Bulunan Yemekler</h3>
+        <div id="search-results-menu-items" class="card-grid"></div>
+        <p id="no-menu-item-results" class="no-results" style="display:none;">Bu kritere uygun yemek bulunamadı.</p>
+    </div>
+</div>
+
+<div id="profile-page" style="display:none;">
+  <div class="container">
+    <div id="profile-message" style="display:none;"></div>
+    <div class="form-section">
+        <h3>Kişisel Bilgiler</h3>
+        <label for="profile-name">Ad Soyad:</label>
+        <input type="text" id="profile-name" />
+        <label for="profile-email">E-posta:</label>
+        <input type="email" id="profile-email" />
+        <label for="profile-address">Adres:</label>
+        <textarea id="profile-address" placeholder="Teslimat adresinizi girin..."></textarea>
+        <button onclick="updateProfile()">Bilgileri Güncelle</button>
+    </div>
+    <div class="form-section">
+        <h3>Şifre Değiştir</h3>
+        <div id="password-message" style="display:none;"></div>
+        <label for="profile-old-password">Mevcut Şifre:</label>
+        <input type="password" id="profile-old-password" />
+        <label for="profile-new-password">Yeni Şifre:</label>
+        <input type="password" id="profile-new-password" placeholder="En az 6 karakter"/>
+        <label for="profile-confirm-password">Yeni Şifre (Tekrar):</label>
+        <input type="password" id="profile-confirm-password" />
+        <button onclick="updatePassword()">Şifreyi Değiştir</button>
+    </div>
+  </div>
+</div>
+
+<div id="my-orders-page" style="display:none;">
+    <h2>Geçmiş Siparişlerim</h2>
+    <div id="orders-list-container"></div>
+    <p id="no-orders-message" class="no-results" style="display:none;">Henüz hiç sipariş vermediniz.</p>
+</div>
+
+<div id="restaurant-panel-page" style="display:none;">
+    <h2>Restoran Sipariş Paneli</h2>
+    <div id="restaurant-selector-container">
+        <h3>Restoran Seçin:</h3>
+        <select id="select-restaurant-for-panel" onchange="loadRestaurantPanelOrders()">
+            <option value="">-- Restoran Seçiniz --</option>
+        </select>
+    </div>
+    <div id="restaurant-orders-list">
+        <!-- Restorana gelen siparişler buraya listelenecek -->
+    </div>
+    <p id="no-restaurant-panel-orders" class="no-results" style="display:none;">Bu restorana ait aktif sipariş bulunmuyor.</p>
+</div>
+
+<div id="courier-panel-page" style="display:none;">
+  <h2>Kurye Paneli</h2>
+  <div id="courier-orders-list"></div>
+  <p id="no-courier-orders" class="no-results" style="display:none;">Teslim etmeniz gereken sipariş bulunmamaktadır.</p>
+</div>
+
+
+<div id="admin-panel-page" style="display:none;">
+    <h2>Admin Yönetim Paneli</h2>
+    <div class="admin-section">
+        <h3>Kullanıcılar</h3>
+        <div class="table-responsive">
+            <table class="admin-table" id="admin-users-table">
+                <thead>
+                    <tr><th>ID</th><th>İsim</th><th>E-posta</th><th>Rol</th><th>Adres</th></tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+        <p id="admin-no-users" class="no-results" style="display:none;">Kullanıcı bulunamadı.</p>
+    </div>
+    <div class="admin-section">
+        <h3>Restoranlar</h3>
+         <div class="table-responsive">
+            <table class="admin-table" id="admin-restaurants-table">
+                <thead>
+                    <tr><th>ID</th><th>Restoran Adı</th><th>Kategori</th><th>Sahip ID</th><th>Sahip Adı</th></tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+        <p id="admin-no-restaurants" class="no-results" style="display:none;">Restoran bulunamadı.</p>
+    </div>
+    <div class="admin-section">
+        <h3>Tüm Siparişler</h3>
+        <div class="table-responsive">
+            <table class="admin-table" id="admin-orders-table">
+                <thead>
+                    <tr><th>Sip. ID</th><th>Müşteri</th><th>Restoran</th><th>Tutar</th><th>Durum</th><th>Tarih</th></tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+        <p id="admin-no-orders" class="no-results" style="display:none;">Sipariş bulunamadı.</p>
+    </div>
+</div>
+
+<footer>
+  © 2025 Yemeksepeti Clone 12.Grubun Projesidir.
+</footer>
+
+<script>
+  const API_URL = 'http://localhost:3000';
+  let currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
+  let currentRestaurantIdForCart = null;
+  let cartItems = [];
+  let searchTimeout = null;
+
+  const authContainer = document.getElementById('auth-container');
+  const loginFormEl = document.getElementById('login-form');
+  const registerFormEl = document.getElementById('register-form');
+  const appHeaderMain = document.getElementById('app-header-main');
+  const mainAppContent = document.getElementById('main-app-content');
+  const profilePage = document.getElementById('profile-page');
+  const userInfoDisplay = document.getElementById('user-info');
+  const loginErrorEl = document.getElementById('login-error');
+  const registerErrorEl = document.getElementById('register-error');
+  const cartSection = document.getElementById('cart');
+  const searchInput = document.getElementById('search-input');
+  const searchResultsPage = document.getElementById('search-results-page');
+  const searchResultsRestaurantsDiv = document.getElementById('search-results-restaurants');
+  const searchResultsMenuItemsDiv = document.getElementById('search-results-menu-items');
+  const myOrdersPage = document.getElementById('my-orders-page');
+  const ordersListContainer = document.getElementById('orders-list-container');
+  const cartItemCountSpan = document.getElementById('cart-item-count');
+  const restaurantListGrid = document.getElementById('restaurant-list-grid');
+  const menuItemListGrid = document.getElementById('menu-item-list-grid');
+  const menuRestaurantNameH2 = document.getElementById('menu-restaurant-name');
+  const menuPlaceholderP = document.getElementById('menu-placeholder');
+  const restaurantPanelBtn = document.getElementById('restaurant-panel-btn');
+  const restaurantPanelPage = document.getElementById('restaurant-panel-page');
+  const selectRestaurantForPanel = document.getElementById('select-restaurant-for-panel');
+  const restaurantOrdersListDiv = document.getElementById('restaurant-orders-list');
+  const myOrdersBtn = document.getElementById('my-orders-btn');
+  const adminPanelBtn = document.getElementById('admin-panel-btn');
+  const adminPanelPage = document.getElementById('admin-panel-page');
+  const adminUsersTableBody = document.querySelector('#admin-users-table tbody');
+  const adminRestaurantsTableBody = document.querySelector('#admin-restaurants-table tbody');
+  const adminOrdersTableBody = document.querySelector('#admin-orders-table tbody');
+  const orderMessageEl = document.getElementById('order-message');
+  const profileMessageEl = document.getElementById('profile-message');
+  const passwordMessageEl = document.getElementById('password-message');
+  const courierPanelBtn = document.getElementById('courier-panel-btn');
+  const courierPanelPage = document.getElementById('courier-panel-page');
+  const courierOrdersListDiv = document.getElementById('courier-orders-list');
+  const noCourierOrdersMsg = document.getElementById('no-courier-orders');
+
+
+  function displayMessage(elementId, message, isSuccess = true, duration = 3000) {
+      const el = document.getElementById(elementId);
+      if (!el) { console.error("Mesaj gösterilecek element bulunamadı:", elementId); alert(message); return; }
+      el.textContent = message; el.className = isSuccess ? 'success' : 'error';
+      el.style.display = 'block';
+      if (duration > 0) { setTimeout(() => { el.style.display = 'none'; }, duration); }
+  }
+
+  function hideAllPages() {
+    authContainer.style.display = 'none';
+    mainAppContent.style.display = 'none';
+    profilePage.style.display = 'none';
+    searchResultsPage.style.display = 'none';
+    myOrdersPage.style.display = 'none';
+    restaurantPanelPage.style.display = 'none';
+    adminPanelPage.style.display = 'none';
+    courierPanelPage.style.display = 'none';
+    appHeaderMain.style.display = 'none';
+  }
+
+  function handleUserRoleUI() {
+    if (!currentUser) {
+        if(adminPanelBtn) adminPanelBtn.style.display = 'none';
+        if(restaurantPanelBtn) restaurantPanelBtn.style.display = 'none';
+        if(myOrdersBtn) myOrdersBtn.style.display = 'none';
+        if(courierPanelBtn) courierPanelBtn.style.display = 'none';
+        return;
+    }
+    if(adminPanelBtn) adminPanelBtn.style.display = currentUser.role === 'admin' ? 'inline-block' : 'none';
+    if(restaurantPanelBtn) restaurantPanelBtn.style.display = currentUser.role === 'restaurant_owner' ? 'inline-block' : 'none';
+    if(myOrdersBtn) myOrdersBtn.style.display = currentUser.role === 'customer' ? 'inline-block' : 'none';
+    if(courierPanelBtn) courierPanelBtn.style.display = currentUser.role === 'courier' ? 'inline-block' : 'none';
+  }
+
+  function handleHeaderTitleClick() {
+    if (!currentUser) return showMainAppContent();
+    if (currentUser.role === 'admin') showAdminPanelPage();
+    else if (currentUser.role === 'restaurant_owner') showRestaurantPanelPage();
+    else if (currentUser.role === 'courier') showCourierPanelPage();
+    else showMainAppContent();
+  }
+
+  async function login() {
+    const email = document.getElementById('login-email').value.trim();
+    const password = document.getElementById('login-password').value.trim();
+    const selectedRole = document.getElementById('login-role').value;
+    loginErrorEl.style.display = 'none';
+
+    if (!email || !password) {
+      displayMessage('login-error', 'Lütfen tüm alanları doldurun.', false);
+      return;
+    }
+
+    try {
+      const response = await fetch(`${API_URL}/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        if (data.role !== selectedRole) {
+          displayMessage('login-error', 'Seçtiğiniz rol ile kullanıcı rolü uyuşmuyor. Lütfen doğru rolü seçin veya kaydınızı kontrol edin.', false);
+          return;
+        }
+
+        currentUser = {
+          userId: data.userId,
+          name: data.name,
+          email: email, // Or data.email if backend sends it
+          role: data.role
+        };
+
+        localStorage.setItem('currentUser', JSON.stringify(currentUser));
+        cartItems = [];
+        currentRestaurantIdForCart = null;
+        updateCartUI();
+        handleUserRoleUI();
+
+        if (currentUser.role === 'admin') {
+          showAdminPanelPage();
+        } else if (currentUser.role === 'restaurant_owner') {
+          showRestaurantPanelPage();
+        } else if (currentUser.role === 'courier') {
+          showCourierPanelPage();
+        } else {
+          showMainAppContent(false);
+        }
+      } else {
+        displayMessage('login-error', data.error || 'Giriş başarısız oldu.', false);
+      }
+    } catch (err) {
+      displayMessage('login-error', 'Sunucuya bağlanırken bir hata oluştu.', false);
+    }
+  }
+
+
+  function checkLoginState() {
+    currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
+    if (currentUser && currentUser.userId && currentUser.name) {
+        userInfoDisplay.textContent = `${currentUser.name}`;
+        handleUserRoleUI();
+        if (currentUser.role === 'admin') showAdminPanelPage();
+        else if (currentUser.role === 'restaurant_owner') showRestaurantPanelPage();
+        else if (currentUser.role === 'courier') showCourierPanelPage();
+        else showMainAppContent(false);
+    } else {
+      showAuthForms();
+      handleUserRoleUI(); // To ensure buttons are hidden
+    }
+  }
+
+  function logout() {
+    currentUser = null; localStorage.removeItem('currentUser');
+    cartItems = []; currentRestaurantIdForCart = null; updateCartUI();
+    handleUserRoleUI(); // To ensure buttons are hidden
+    showAuthForms();
+  }
+
+  function showAuthForms() {
+    hideAllPages();
+    authContainer.style.display = 'block';
+    showLogin();
+  }
+
+  function showLogin() {
+    loginFormEl.style.display = 'block'; registerFormEl.style.display = 'none';
+    loginErrorEl.style.display = 'none';
+    if(document.getElementById('login-email')) document.getElementById('login-email').value = '';
+    if(document.getElementById('login-password')) document.getElementById('login-password').value = '';
+  }
+
+  function showRegister() {
+    loginFormEl.style.display = 'none'; registerFormEl.style.display = 'block';
+    registerErrorEl.style.display = 'none';
+    if(document.getElementById('register-name')) document.getElementById('register-name').value = '';
+    if(document.getElementById('register-email')) document.getElementById('register-email').value = '';
+    if(document.getElementById('register-password')) document.getElementById('register-password').value = '';
+    // Reset role selection related things for registration
+    const registerRoleSelect = document.getElementById('register-role');
+    const registerButton = document.getElementById('register-button');
+    if(registerRoleSelect) registerRoleSelect.value = 'customer'; // Default to customer
+    if(registerButton) registerButton.disabled = false;
+  }
+
+  function showMainAppContent(clearSearch = true) {
+    hideAllPages();
+    appHeaderMain.style.display = 'flex';
+    mainAppContent.style.display = 'block';
+    if (currentUser) userInfoDisplay.textContent = `${currentUser.name}`;
+    if (clearSearch && searchInput) searchInput.value = '';
+    loadRestaurants();
+    if (menuItemListGrid) menuItemListGrid.innerHTML = '';
+    if (menuPlaceholderP) menuPlaceholderP.style.display = 'block';
+    if (menuRestaurantNameH2) menuRestaurantNameH2.textContent = 'Menü';
+    updateCartUI();
+  }
+
+  function showProfilePage() {
+    hideAllPages();
+    appHeaderMain.style.display = 'flex'; profilePage.style.display = 'block';
+    loadProfileData();
+    if (profileMessageEl) profileMessageEl.style.display = 'none';
+    if (passwordMessageEl) passwordMessageEl.style.display = 'none';
+    if(document.getElementById('profile-old-password')) document.getElementById('profile-old-password').value = '';
+    if(document.getElementById('profile-new-password')) document.getElementById('profile-new-password').value = '';
+    if(document.getElementById('profile-confirm-password')) document.getElementById('profile-confirm-password').value = '';
+  }
+
+  function showSearchResultsPage() {
+      hideAllPages();
+      appHeaderMain.style.display = 'flex';
+      searchResultsPage.style.display = 'block';
+  }
+
+  function showMyOrdersPage() {
+      hideAllPages();
+      appHeaderMain.style.display = 'flex';
+      myOrdersPage.style.display = 'block';
+      loadMyOrders();
+  }
+
+  function showRestaurantPanelPage() {
+      hideAllPages();
+      appHeaderMain.style.display = 'flex';
+      restaurantPanelPage.style.display = 'block';
+      loadOwnedRestaurantsForPanel();
+      if (restaurantOrdersListDiv) restaurantOrdersListDiv.innerHTML = '';
+      const noOrdersMsg = document.getElementById('no-restaurant-panel-orders');
+      if (noOrdersMsg) noOrdersMsg.style.display = 'none';
+  }
+
+  function showAdminPanelPage() {
+      hideAllPages();
+      appHeaderMain.style.display = 'flex';
+      adminPanelPage.style.display = 'block';
+      loadAdminUsers();
+      loadAdminRestaurants();
+      loadAdminOrders();
+  }
+
+    function showCourierPanelPage() {
+        hideAllPages();
+        appHeaderMain.style.display = 'flex';
+        courierPanelPage.style.display = 'block';
+        loadCourierOrders();
+    }
+
+  async function register() {
+    const name = document.getElementById('register-name').value.trim();
+    const email = document.getElementById('register-email').value.trim();
+    const password = document.getElementById('register-password').value.trim();
+    const role = document.getElementById('register-role').value;
+    registerErrorEl.style.display = 'none';
+
+    if (role === 'restaurant_owner') { // This check is also in event listener, but good for direct calls.
+      displayMessage('register-error', 'Restoran sahipleri için kayıt kapalıdır. Lütfen sistem yöneticisine başvurun.', false, 5000);
+      return;
+    }
+
+    if (!name || !email || !password) {
+      displayMessage('register-error', 'Lütfen tüm alanları doldurun.', false);
+      return;
+    }
+    if (password.length < 6) {
+      displayMessage('register-error', 'Şifre en az 6 karakter olmalıdır.', false);
+      return;
+    }
+    try {
+      const response = await fetch(`${API_URL}/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, password, role })
+      });
+      const data = await response.json();
+      if (response.status === 201) {
+        displayMessage('login-error', 'Kayıt başarılı! Lütfen giriş yapın.', true, 5000);
+        showLogin();
+      } else {
+        displayMessage('register-error', data.error || 'Kayıt başarısız oldu.', false);
+      }
+    } catch (err) {
+      displayMessage('register-error', 'Sunucuya bağlanırken bir hata oluştu.', false);
+    }
+  }
+
+
+  async function loadProfileData() {
+    if (!currentUser || !currentUser.userId) return;
+    try {
+      const response = await fetch(`${API_URL}/profile/${currentUser.userId}`);
+      if (!response.ok) throw new Error('Profil bilgileri yüklenemedi.');
+      const user = await response.json();
+      if(document.getElementById('profile-name')) document.getElementById('profile-name').value = user.name || '';
+      if(document.getElementById('profile-email')) document.getElementById('profile-email').value = user.email || '';
+      if(document.getElementById('profile-address')) document.getElementById('profile-address').value = user.address || '';
+    } catch (err) {
+      displayMessage('profile-message', err.message || 'Profil bilgileri yüklenirken bir hata oluştu.', false);
+    }
+  }
+
+  async function updateProfile() {
+    if (!currentUser || !currentUser.userId) return;
+    const name = document.getElementById('profile-name').value.trim();
+    const email = document.getElementById('profile-email').value.trim();
+    const address = document.getElementById('profile-address').value.trim();
+    if (!name || !email) {
+      displayMessage('profile-message', 'Ad Soyad ve E-posta alanları zorunludur.', false);
+      return;
+    }
+    try {
+      const response = await fetch(`${API_URL}/profile/${currentUser.userId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, address })
+      });
+      const data = await response.json();
+      if (response.ok) {
+        displayMessage('profile-message', 'Profil bilgileriniz başarıyla güncellendi.', true);
+        currentUser.name = data.user.name;
+        currentUser.email = data.user.email;
+        localStorage.setItem('currentUser', JSON.stringify(currentUser));
+        userInfoDisplay.textContent = `${currentUser.name}`;
+      } else {
+        displayMessage('profile-message', data.error || 'Profil güncellenirken bir hata oluştu.', false);
+      }
+    } catch (err) {
+      displayMessage('profile-message', 'Sunucuya bağlanırken bir hata oluştu.', false);
+    }
+  }
+
+  async function updatePassword() {
+    if (!currentUser || !currentUser.userId) return;
+    const oldPassword = document.getElementById('profile-old-password').value;
+    const newPassword = document.getElementById('profile-new-password').value;
+    const confirmPassword = document.getElementById('profile-confirm-password').value;
+    if (!oldPassword || !newPassword || !confirmPassword) {
+      displayMessage('password-message', 'Lütfen tüm şifre alanlarını doldurun.', false);
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      displayMessage('password-message', 'Yeni şifreler uyuşmuyor.', false);
+      return;
+    }
+    if (newPassword.length < 6) {
+      displayMessage('password-message', 'Yeni şifre en az 6 karakter olmalıdır.', false);
+      return;
+    }
+    try {
+      const response = await fetch(`${API_URL}/profile/${currentUser.userId}/password`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ oldPassword, newPassword })
+      });
+      const data = await response.json();
+      if (response.ok) {
+        displayMessage('password-message', 'Şifreniz başarıyla değiştirildi.', true);
+        if(document.getElementById('profile-old-password')) document.getElementById('profile-old-password').value = '';
+        if(document.getElementById('profile-new-password')) document.getElementById('profile-new-password').value = '';
+        if(document.getElementById('profile-confirm-password')) document.getElementById('profile-confirm-password').value = '';
+      } else {
+        displayMessage('password-message', data.error || 'Şifre değiştirilemedi.', false);
+      }
+    } catch (err) {
+      displayMessage('password-message', 'Sunucuya bağlanırken bir hata oluştu.', false);
+    }
+  }
+
+  async function loadRestaurants() {
+    if (!restaurantListGrid) return;
+    restaurantListGrid.innerHTML = '<p>Restoranlar yükleniyor...</p>';
+    try {
+      const response = await fetch(`${API_URL}/restaurants`);
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+      const data = await response.json();
+      restaurantListGrid.innerHTML = '';
+      if(data.length === 0) {
+        restaurantListGrid.innerHTML = '<p class="no-results">Henüz hiç restoran eklenmemiş.</p>';
+        return;
+      }
+      data.forEach(r => restaurantListGrid.appendChild(createRestaurantCard(r)));
+    } catch (err) {
+      restaurantListGrid.innerHTML = '<p class="error">Restoranlar yüklenirken bir hata oluştu.</p>';
+      console.error("Restoran yükleme hatası:", err);
+    }
+  }
+
+  function createRestaurantCard(restaurant) {
+    const card = document.createElement('div');
+    card.className = 'restaurant-card';
+    const safeName = restaurant.name ? restaurant.name.replace(/'/g, "\\'") : "Bilinmeyen Restoran";
+    const imageUrl = restaurant.image_url || 'https://via.placeholder.com/300x160.png?text=Restoran';
+    card.innerHTML = `
+        <img src="${imageUrl}" alt="${safeName}" class="card-image">
+        <div class="card-content">
+            <h3 onclick="loadMenu(${restaurant.id}, '${safeName}')">${safeName}</h3>
+            <p>${restaurant.category || 'Kategori Belirtilmemiş'}</p>
+            <p><small>${restaurant.address || 'Adres Yok'}</small></p>
+            <p><small>${restaurant.description || ''}</small></p>
+        </div>
+    `;
+    return card;
+  }
+
+  async function loadMenu(restaurantId, restaurantName) {
+    if (currentRestaurantIdForCart && currentRestaurantIdForCart !== restaurantId && cartItems.length > 0) {
+        if (!confirm("Farklı bir restorandan ürün seçiyorsunuz. Mevcut sepetinizdeki ürünler silinecektir. Devam etmek istiyor musunuz?")) {
+            return;
+        }
+        cartItems = []; currentRestaurantIdForCart = null; updateCartUI();
+    }
+    if (mainAppContent.style.display === 'none') {
+        showMainAppContent(false);
+    }
+    if (menuRestaurantNameH2) menuRestaurantNameH2.textContent = `${restaurantName} - Menü`;
+    if (menuItemListGrid) menuItemListGrid.innerHTML = '<p>Menü yükleniyor...</p>';
+    if (menuPlaceholderP) menuPlaceholderP.style.display = 'none';
+
+    try {
+      const response = await fetch(`${API_URL}/menu/${restaurantId}`);
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+      const data = await response.json();
+      if (menuItemListGrid) menuItemListGrid.innerHTML = '';
+      if (data.length === 0) {
+        if (menuItemListGrid) menuItemListGrid.innerHTML = '<p class="no-results">Bu restorana ait menü öğesi bulunamadı.</p>';
+        return;
+      }
+      data.forEach(item => menuItemListGrid.appendChild(createMenuItemCard(item, restaurantId)));
+    } catch (err) {
+      if (menuItemListGrid) menuItemListGrid.innerHTML = `<p class="error">Menü yüklenirken bir hata oluştu.</p>`;
+      console.error("Menü yükleme hatası (Restoran ID: " + restaurantId + "):", err);
+    }
+  }
+
+  function createMenuItemCard(item, restaurantId) {
+    const card = document.createElement('div');
+    card.className = 'menu-item-card';
+    const safeItemName = item.name ? item.name.replace(/'/g, "\\'").replace(/"/g, '"') : "Bilinmeyen Ürün";
+    const safeItemImageUrl = (item.image_url || '').replace(/'/g, "\\'");
+    const imageUrl = item.image_url || 'https://via.placeholder.com/300x160.png?text=Yemek';
+    const price = typeof item.price === 'number' ? item.price.toFixed(2) : 'N/A';
+
+    card.innerHTML = `
+        <img src="${imageUrl}" alt="${safeItemName}" class="card-image">
+        <div class="card-content">
+            <h3>${safeItemName}</h3>
+            <p>${item.category || ''}</p>
+            <p><small>${item.description || ''}</small></p>
+            <p class="price">${price}₺</p>
+            <button class="add-to-cart-btn" onclick="addToCart({id: ${item.id}, price: ${parseFloat(price)}, name: '${safeItemName}', restaurantId: ${restaurantId}, image_url: '${safeItemImageUrl}'})">Sepete Ekle</button>
+        </div>
+    `;
+    return card;
+  }
+
+
+  function handleSearchDebounced(event) {
+    clearTimeout(searchTimeout);
+    const searchTerm = event.target.value.trim();
+    if (searchTerm.length === 0) {
+        if(searchResultsPage.style.display === 'block') showMainAppContent(false);
+        return;
+    }
+    if (searchTerm.length < 2 && event.key !== "Enter") return;
+    searchTimeout = setTimeout(() => {
+        performSearch(searchTerm);
+    }, 500);
+  }
+
+  async function performSearch(term) {
+    if (!term) return;
+    showSearchResultsPage();
+    if(document.getElementById('search-query-display')) document.getElementById('search-query-display').textContent = `'${term}' için Arama Sonuçları`;
+    if (searchResultsRestaurantsDiv) searchResultsRestaurantsDiv.innerHTML = '<p>Restoranlar aranıyor...</p>';
+    if (searchResultsMenuItemsDiv) searchResultsMenuItemsDiv.innerHTML = '<p>Yemekler aranıyor...</p>';
+    if(document.getElementById('no-restaurant-results')) document.getElementById('no-restaurant-results').style.display = 'none';
+    if(document.getElementById('no-menu-item-results')) document.getElementById('no-menu-item-results').style.display = 'none';
+
+    try {
+        const r_response = await fetch(`${API_URL}/restaurants?search=${encodeURIComponent(term)}`);
+        if (!r_response.ok) throw new Error('Restoran arama hatası');
+        const r_data = await r_response.json();
+        if (searchResultsRestaurantsDiv) searchResultsRestaurantsDiv.innerHTML = '';
+        if (r_data.length > 0) {
+            r_data.forEach(r => searchResultsRestaurantsDiv.appendChild(createRestaurantCard(r)));
+        } else {
+            if(document.getElementById('no-restaurant-results')) document.getElementById('no-restaurant-results').style.display = 'block';
+        }
+
+        const m_response = await fetch(`${API_URL}/menu-items/search?q=${encodeURIComponent(term)}`);
+        if (!m_response.ok) throw new Error('Yemek arama hatası');
+        const m_data = await m_response.json();
+        if (searchResultsMenuItemsDiv) searchResultsMenuItemsDiv.innerHTML = '';
+        if (m_data.length > 0) {
+            m_data.forEach(item => {
+                const menuItemData = {
+                    id: item.menu_id, name: item.menu_name, description: item.menu_description,
+                    price: item.menu_price, category: item.menu_category, image_url: item.menu_image_url
+                };
+                searchResultsMenuItemsDiv.appendChild(createMenuItemCard(menuItemData, item.restaurant_id));
+            });
+        } else {
+            if(document.getElementById('no-menu-item-results')) document.getElementById('no-menu-item-results').style.display = 'block';
+        }
+    } catch (error) {
+        console.error("Arama sırasında hata:", error);
+        if (searchResultsRestaurantsDiv) searchResultsRestaurantsDiv.innerHTML = '<p class="error">Restoran arama sırasında hata.</p>';
+        if (searchResultsMenuItemsDiv) searchResultsMenuItemsDiv.innerHTML = '<p class="error">Yemek arama sırasında hata.</p>';
+    }
+  }
+
+  function addToCart(itemToAdd) {
+    if (cartItems.length > 0 && currentRestaurantIdForCart !== itemToAdd.restaurantId) {
+        if (!confirm("Farklı bir restorandan ürün eklemeye çalışıyorsunuz. Sepetinizdeki mevcut ürünler silinecektir. Onaylıyor musunuz?")) {
+            return;
+        }
+        cartItems = [];
+    }
+    currentRestaurantIdForCart = itemToAdd.restaurantId;
+    const existingItem = cartItems.find(i => i.id === itemToAdd.id);
+    if (existingItem) existingItem.qty++;
+    else cartItems.push({ ...itemToAdd, qty: 1 });
+    updateCartUI();
+  }
+
+  function removeFromCart(itemId) {
+    const itemIndex = cartItems.findIndex(i => i.id === itemId);
+    if (itemIndex > -1) {
+      cartItems[itemIndex].qty--;
+      if (cartItems[itemIndex].qty <= 0) {
+        cartItems.splice(itemIndex, 1);
+      }
+    }
+    if (cartItems.length === 0) {
+        currentRestaurantIdForCart = null;
+    }
+    updateCartUI();
+  }
+
+  function updateCartUI() {
+    const cartItemsDiv = document.getElementById('cart-items');
+    const cartTotalDiv = document.getElementById('cart-total');
+    const checkoutButton = document.getElementById('checkout-button');
+    if (!cartItemsDiv || !cartTotalDiv || !checkoutButton || !cartItemCountSpan) return;
+
+    cartItemsDiv.innerHTML = '';
+    let total = 0;
+    let itemCount = 0;
+
+    if (cartItems.length === 0) {
+      if(cartSection) cartSection.style.display = 'none';
+      cartTotalDiv.textContent = 'Toplam: 0.00₺';
+      checkoutButton.disabled = true;
+      cartItemCountSpan.style.display = 'none';
+      cartItemCountSpan.textContent = '0';
+      return;
+    }
+
+    if(cartSection) cartSection.style.display = 'block';
+    checkoutButton.disabled = false;
+
+    cartItems.forEach(item => {
+      total += item.price * item.qty;
+      itemCount += item.qty;
+      const safeItemName = item.name.replace(/'/g, "\\'").replace(/"/g, '"');
+      const itemImageUrl = (item.image_url || '').replace(/'/g, "\\'");
+      const div = document.createElement('div');
+      div.className = 'cart-item';
+      div.innerHTML = `
+        <span class="name-qty">${item.name} (x${item.qty}) - <b>${(item.price * item.qty).toFixed(2)}₺</b></span>
+        <div class="cart-item-controls">
+          <button onclick="addToCart({id: ${item.id}, price: ${item.price}, name: '${safeItemName}', restaurantId: ${item.restaurantId}, image_url: '${itemImageUrl}'})">+</button>
+          <button onclick="removeFromCart(${item.id})">-</button>
+        </div>
+      `;
+      cartItemsDiv.appendChild(div);
+    });
+
+    cartTotalDiv.textContent = `Toplam: ${total.toFixed(2)}₺`;
+    if (itemCount > 0) {
+        cartItemCountSpan.textContent = itemCount;
+        cartItemCountSpan.style.display = 'inline-block';
+    } else {
+        cartItemCountSpan.style.display = 'none';
+    }
+  }
+
+  function toggleCartView() {
+      if (!cartSection) return;
+      if (cartSection.style.display === 'none' || cartSection.style.display === '') {
+          if (cartItems.length > 0) cartSection.style.display = 'block';
+          else alert("Sepetiniz boş!");
+      } else {
+          cartSection.style.display = 'none';
+      }
+  }
+
+  async function placeOrder() {
+    if (!currentUser || !currentUser.userId) {
+        displayMessage('order-message', 'Sipariş vermek için giriş yapmalısınız.', false); return;
+    }
+    if (cartItems.length === 0) {
+        displayMessage('order-message', 'Sepetiniz boş.', false); return;
+    }
+    if (!currentRestaurantIdForCart) {
+        displayMessage('order-message', 'Sipariş için bir restorandan ürün seçilmemiş.', false); return;
+    }
+    const orderData = {
+        userId: currentUser.userId,
+        restaurantId: currentRestaurantIdForCart,
+        items: cartItems.map(item => ({ menuId: item.id, quantity: item.qty }))
+    };
+    try {
+        const response = await fetch(`${API_URL}/order`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(orderData)
+        });
+        const data = await response.json();
+        if (response.status === 201) {
+            displayMessage('order-message', `Siparişiniz başarıyla alındı! Sipariş No: ${data.orderId}`, true, 5000);
+            cartItems = []; currentRestaurantIdForCart = null; updateCartUI();
+            setTimeout(() => showMyOrdersPage(), 1000);
+        } else {
+            displayMessage('order-message', data.error || 'Sipariş verilirken bir hata oluştu.', false);
+        }
+    } catch (err) {
+        displayMessage('order-message', 'Sunucuya bağlanırken bir hata oluştu.', false);
+    }
+  }
+
+  async function loadMyOrders() {
+    if (!currentUser || !currentUser.userId) {
+        if(ordersListContainer) ordersListContainer.innerHTML = '<p class="error">Siparişlerinizi görmek için giriş yapmalısınız.</p>';
+        if(document.getElementById('no-orders-message')) document.getElementById('no-orders-message').style.display = 'none';
+        return;
+    }
+    if(ordersListContainer) ordersListContainer.innerHTML = '<p>Siparişleriniz yükleniyor...</p>';
+    if(document.getElementById('no-orders-message')) document.getElementById('no-orders-message').style.display = 'none';
+
+    try {
+        const response = await fetch(`${API_URL}/orders/${currentUser.userId}`);
+        if (!response.ok) throw new Error('Siparişler yüklenemedi.');
+        const orders = await response.json();
+        if(ordersListContainer) ordersListContainer.innerHTML = '';
+        if (orders.length === 0) {
+            if(document.getElementById('no-orders-message')) document.getElementById('no-orders-message').style.display = 'block';
+            return;
+        }
+        orders.forEach(order => {
+            ordersListContainer.appendChild(createOrderCard(order));
+        });
+    } catch (error) {
+        console.error("Siparişleri yükleme hatası:", error);
+        if(ordersListContainer) ordersListContainer.innerHTML = '<p class="error">Siparişler yüklenirken bir hata oluştu.</p>';
+    }
+  }
+
+  function createOrderCard(order) {
+    const card = document.createElement('div');
+    card.className = 'order-card';
+    const orderDate = new Date(order.created_at).toLocaleString('tr-TR', {
+        year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
+    });
+    let statusClass = order.status ? order.status.toLowerCase().replace(/\s+/g, '-') : "pending";
+    const validStatusClasses = ["hazirlaniyor", "hazırlanıyor", "yolda", "teslim-edildi", "iptal-edildi", "pending", "preparing", "delivered", "cancelled", "kuryeye-verildi"];
+    if (!validStatusClasses.includes(statusClass)) statusClass = "pending";
+
+    let itemsHtml = '<div class="order-items-list"><h4>Sipariş İçeriği:</h4>';
+    if (order.items && order.items.length > 0) {
+        order.items.forEach(item => {
+            const itemImage = item.menu_image_url || 'https://via.placeholder.com/50x50.png?text=Yemek';
+            itemsHtml += `
+                <div class="order-item-detail">
+                    <img src="${itemImage}" alt="${item.menu_name || 'Ürün'}" class="item-logo">
+                    <span class="name">${item.menu_name || 'Bilinmeyen Ürün'} (x${item.quantity || 1})</span>
+                    <span class="qty-price">${(item.price && item.quantity ? (item.price * item.quantity).toFixed(2) : 'N/A')}₺</span>
+                </div>
+            `;
+        });
+    } else {
+        itemsHtml += '<p>Sipariş detayı bulunamadı.</p>';
+    }
+    itemsHtml += '</div>';
+    const restaurantImage = order.restaurant_image_url || 'https://via.placeholder.com/50x50.png?text=Restoran';
+    card.innerHTML = `
+        <div class="order-card-header">
+            <img src="${restaurantImage}" alt="${order.restaurant_name || 'Restoran'}" class="restaurant-logo">
+            <div class="restaurant-info">
+                <h3>${order.restaurant_name || 'Bilinmeyen Restoran'}</h3>
+            </div>
+            <span class="status ${statusClass}">${order.status || 'Durum Yok'}</span>
+        </div>
+        <div class="order-card-body">
+            <p><strong>Sipariş No:</strong> #${order.orderId || 'N/A'}</p>
+            <p><strong>Tarih:</strong> ${orderDate}</p>
+            <p><strong>Toplam Tutar:</strong> ${order.total_price ? order.total_price.toFixed(2) : 'N/A'}₺</p>
+            ${itemsHtml}
+        </div>
+    `;
+    return card;
+  }
+
+  async function loadOwnedRestaurantsForPanel() {
+    if (!currentUser || currentUser.role !== 'restaurant_owner' || !selectRestaurantForPanel) return;
+    selectRestaurantForPanel.innerHTML = '<option value="">-- Restoran Seçiniz --</option>';
+    const noOrdersMsg = document.getElementById('no-restaurant-panel-orders');
+
+    try {
+        const response = await fetch(`${API_URL}/my-restaurants`, {
+            headers: { 'user-id': currentUser.userId.toString() }
+        });
+        if (!response.ok) {
+            const errData = await response.json();
+            throw new Error(errData.error || 'Restoranlarınız yüklenemedi.');
+        }
+        const restaurants = await response.json();
+        const restaurantSelectorContainer = document.getElementById('restaurant-selector-container');
+
+        if (restaurants.length === 0) {
+            selectRestaurantForPanel.innerHTML = '<option value="">Sahip olduğunuz restoran bulunmuyor.</option>';
+            if (restaurantSelectorContainer) restaurantSelectorContainer.style.display = 'none';
+            if (noOrdersMsg && restaurantOrdersListDiv) {
+                restaurantOrdersListDiv.innerHTML = '';
+                noOrdersMsg.textContent = 'Panelde gösterilecek restoranınız bulunmuyor.';
+                noOrdersMsg.style.display = 'block';
+            }
+            return;
+        }
+
+        if (restaurantSelectorContainer) restaurantSelectorContainer.style.display = 'block';
+        restaurants.forEach(r => {
+            const option = document.createElement('option');
+            option.value = r.id;
+            option.textContent = r.name;
+            selectRestaurantForPanel.appendChild(option);
+        });
+        if (restaurants.length > 0) {
+             selectRestaurantForPanel.value = restaurants[0].id;
+             loadRestaurantPanelOrders();
+        }
+
+    } catch (error) {
+        console.error("Sahip olunan restoranları yükleme hatası:", error);
+        selectRestaurantForPanel.innerHTML = '<option value="">Restoranlar yüklenirken hata oluştu.</option>';
+        if (restaurantOrdersListDiv) restaurantOrdersListDiv.innerHTML = `<p class="error">${error.message}</p>`;
+    }
+}
+
+async function loadRestaurantPanelOrders() {
+    if (!selectRestaurantForPanel) return;
+    const selectedRestaurantId = selectRestaurantForPanel.value;
+    const noOrdersMsg = document.getElementById('no-restaurant-panel-orders');
+    if (!selectedRestaurantId) {
+        if(restaurantOrdersListDiv) restaurantOrdersListDiv.innerHTML = '';
+        if (noOrdersMsg) noOrdersMsg.style.display = 'none';
+        return;
+    }
+    if(restaurantOrdersListDiv) restaurantOrdersListDiv.innerHTML = '<p>Siparişler yükleniyor...</p>';
+    if (noOrdersMsg) noOrdersMsg.style.display = 'none';
+
+    try {
+        const response = await fetch(`${API_URL}/restaurant-panel/orders/${selectedRestaurantId}`, {
+            headers: { 'user-id': currentUser.userId.toString() }
+        });
+        if (!response.ok) {
+            const errData = await response.json();
+            throw new Error(errData.error || 'Siparişler yüklenemedi.');
+        }
+        const orders = await response.json();
+        if(restaurantOrdersListDiv) restaurantOrdersListDiv.innerHTML = '';
+        if (orders.length === 0) {
+            if (noOrdersMsg) {
+                 noOrdersMsg.textContent = 'Bu restorana ait aktif sipariş bulunmuyor.';
+                 noOrdersMsg.style.display = 'block';
+            }
+        } else {
+            orders.forEach(order => restaurantOrdersListDiv.appendChild(createRestaurantPanelOrderCard(order)));
+        }
+    } catch (error) {
+        console.error("Restoran paneli siparişleri yükleme hatası:", error);
+        if(restaurantOrdersListDiv) restaurantOrdersListDiv.innerHTML = `<p class="error">${error.message}</p>`;
+    }
+}
+
+function createRestaurantPanelOrderCard(order) {
+    const card = document.createElement('div');
+    card.className = 'restaurant-panel-order-card';
+    const orderDate = new Date(order.created_at).toLocaleString('tr-TR', {
+        year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
+    });
+
+    let itemsHtml = '<div class="rp-order-items"><h4>Sipariş Detayları:</h4>';
+    if (order.items && order.items.length > 0) {
+        order.items.forEach(item => {
+            itemsHtml += `<div class="rp-order-item">${item.menu_name || 'Ürün'} x ${item.quantity || 1} (${(item.price && item.quantity ? (item.price * item.quantity).toFixed(2) : 'N/A')}₺)</div>`;
+        });
+    } else {
+        itemsHtml += '<p>Sipariş detayı bulunamadı.</p>';
+    }
+    itemsHtml += '</div>';
+
+    const statusOptions = ['hazırlanıyor', 'kuryeye verildi', 'iptal edildi']; // Restaurant owner can only set these or equivalent
+    let statusSelectHtml = `<select class="status-select" id="status-select-${order.orderId}">`;
+    statusOptions.forEach(s => {
+        statusSelectHtml += `<option value="${s}" ${(order.status || '').toLowerCase() === s ? 'selected' : ''}>${s.charAt(0).toUpperCase() + s.slice(1)}</option>`;
+    });
+    statusSelectHtml += `</select>`;
+
+    let statusClass = order.status ? order.status.toLowerCase().replace(/\s+/g, '-') : "pending";
+    const validStatusClasses = ["hazirlaniyor", "hazırlanıyor", "yolda", "teslim-edildi", "iptal-edildi", "pending", "preparing", "delivered", "cancelled", "kuryeye-verildi"];
+    if (!validStatusClasses.includes(statusClass)) statusClass = "pending";
+
+    card.innerHTML = `
+        <div class="rp-order-header">
+            <strong>Sipariş No: #${order.orderId || 'N/A'}</strong>
+            <span class="status ${statusClass}">${order.status || 'Durum Yok'}</span>
+        </div>
+        <div class="rp-order-body">
+            <p><strong>Müşteri:</strong> ${order.customer_name || 'N/A'}</p>
+            <p><strong>Tarih:</strong> ${orderDate}</p>
+            <p><strong>E-posta:</strong> ${order.customer_email || 'N/A'}</p>
+            <p><strong>Adres:</strong> ${order.customer_address || 'Adres Yok'}</p>
+            <p><strong>Toplam Tutar:</strong> ${order.total_price ? order.total_price.toFixed(2) : 'N/A'}₺</p>
+            ${itemsHtml}
+            <div style="margin-top: 15px; display: flex; align-items: center;">
+                <strong style="margin-right: 5px;">Durumu Değiştir:</strong>
+                ${statusSelectHtml}
+                <button class="update-status-btn" onclick="updateOrderStatusByOwnerOrAdmin(${order.orderId})">Güncelle</button>
+            </div>
+        </div>
+    `;
+    return card;
+}
+
+async function updateOrderStatusByOwnerOrAdmin(orderId) { // Renamed to be more generic
+    const statusSelect = document.getElementById(`status-select-${orderId}`);
+    if (!statusSelect) {
+        console.error(`Status select for order ${orderId} not found.`);
+        alert("Durum seçimi elementi bulunamadı.");
+        return;
+    }
+    const newStatus = statusSelect.value;
+
+    if (!newStatus) {
+        alert("Lütfen bir durum seçin.");
+        return;
+    }
+     // Backend will authorize if this user (owner or admin) can set this status
+    try {
+        const response = await fetch(`${API_URL}/order/${orderId}/status`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'user-id': currentUser.userId.toString()
+            },
+            body: JSON.stringify({ status: newStatus })
+        });
+        const data = await response.json();
+        if (response.ok) {
+            alert(data.message);
+            if (adminPanelPage.style.display === 'block') loadAdminOrders();
+            if (restaurantPanelPage.style.display === 'block') loadRestaurantPanelOrders();
+            // If a courier is viewing this and the status is changed by an admin/owner, their view won't auto-update.
+            // This function is primarily for owner/admin panels. Courier panel has its own update logic.
+        } else {
+            alert(`Hata: ${data.error || 'Bilinmeyen bir hata oluştu.'}`);
+        }
+    } catch (error) {
+        console.error("Sipariş durumu güncelleme hatası:", error);
+        alert("Sipariş durumu güncellenirken bir sunucu hatası oluştu.");
+    }
+}
+
+async function loadAdminUsers() {
+    if (!currentUser || currentUser.role !== 'admin' || !adminUsersTableBody) return;
+    adminUsersTableBody.innerHTML = '<tr><td colspan="5">Kullanıcılar yükleniyor...</td></tr>';
+    if(document.getElementById('admin-no-users')) document.getElementById('admin-no-users').style.display = 'none';
+    try {
+        const response = await fetch(`${API_URL}/admin/users`, {
+            headers: { 'user-id': currentUser.userId.toString() }
+        });
+        if (!response.ok) throw new Error('Kullanıcılar yüklenemedi.');
+        const users = await response.json();
+        adminUsersTableBody.innerHTML = '';
+        if (users.length === 0) {
+            if(document.getElementById('admin-no-users')) document.getElementById('admin-no-users').style.display = 'table-row'; // 'table-row' for p inside table structure
+        } else {
+            users.forEach(user => {
+                const row = adminUsersTableBody.insertRow();
+                row.insertCell().textContent = user.id;
+                row.insertCell().textContent = user.name;
+                row.insertCell().textContent = user.email;
+                row.insertCell().textContent = user.role;
+                row.insertCell().textContent = user.address || '-';
+            });
+        }
+    } catch (error) {
+        adminUsersTableBody.innerHTML = `<tr><td colspan="5" class="error">${error.message}</td></tr>`;
+    }
+}
+
+async function loadAdminRestaurants() {
+    if (!currentUser || currentUser.role !== 'admin' || !adminRestaurantsTableBody) return;
+    adminRestaurantsTableBody.innerHTML = '<tr><td colspan="5">Restoranlar yükleniyor...</td></tr>';
+    if(document.getElementById('admin-no-restaurants')) document.getElementById('admin-no-restaurants').style.display = 'none';
+    try {
+        const response = await fetch(`${API_URL}/admin/restaurants`, {
+            headers: { 'user-id': currentUser.userId.toString() }
+        });
+        if (!response.ok) throw new Error('Restoranlar yüklenemedi.');
+        const restaurants = await response.json();
+        adminRestaurantsTableBody.innerHTML = '';
+        if (restaurants.length === 0) {
+            if(document.getElementById('admin-no-restaurants')) document.getElementById('admin-no-restaurants').style.display = 'table-row';
+        } else {
+            restaurants.forEach(r => {
+                const row = adminRestaurantsTableBody.insertRow();
+                row.insertCell().textContent = r.id;
+                row.insertCell().textContent = r.name;
+                row.insertCell().textContent = r.category || '-';
+                row.insertCell().textContent = r.owner_id || 'N/A';
+                row.insertCell().textContent = r.owner_name || (r.owner_id ? 'Sahip Bilgisi Yok' : 'Sahipsiz');
+            });
+        }
+    } catch (error) {
+        adminRestaurantsTableBody.innerHTML = `<tr><td colspan="5" class="error">${error.message}</td></tr>`;
+    }
+}
+
+async function loadAdminOrders() {
+    if (!currentUser || currentUser.role !== 'admin' || !adminOrdersTableBody) return;
+    adminOrdersTableBody.innerHTML = '<tr><td colspan="6">Siparişler yükleniyor...</td></tr>';
+    if(document.getElementById('admin-no-orders')) document.getElementById('admin-no-orders').style.display = 'none';
+    try {
+        const response = await fetch(`${API_URL}/admin/all-orders`, {
+            headers: { 'user-id': currentUser.userId.toString() }
+        });
+        if (!response.ok) {
+             const errData = await response.json().catch(() => ({error: "Siparişler yüklenirken sunucu hatası."}));
+             throw new Error(errData.error || 'Siparişler yüklenemedi.');
+        }
+        const orders = await response.json();
+        adminOrdersTableBody.innerHTML = '';
+        if (orders.length === 0) {
+            if(document.getElementById('admin-no-orders')) document.getElementById('admin-no-orders').style.display = 'table-row';
+        } else {
+            orders.forEach(order => {
+                const row = adminOrdersTableBody.insertRow();
+                row.insertCell().textContent = `#${order.orderId}`;
+                row.insertCell().textContent = `${order.user_name || 'N/A'} (${order.user_email || 'N/A'})`;
+                row.insertCell().textContent = order.restaurant_name || 'N/A';
+                row.insertCell().textContent = order.total_price ? `${order.total_price.toFixed(2)}₺` : 'N/A';
+                row.insertCell().textContent = order.status;
+                row.insertCell().textContent = new Date(order.created_at).toLocaleDateString('tr-TR');
+            });
+        }
+    } catch (error) {
+        adminOrdersTableBody.innerHTML = `<tr><td colspan="6" class="error">${error.message}</td></tr>`;
+    }
+}
+
+    async function loadCourierOrders() {
+        if (!currentUser || currentUser.role !== 'courier' || !courierOrdersListDiv || !noCourierOrdersMsg) return;
+
+        courierOrdersListDiv.innerHTML = '<p>Yükleniyor...</p>';
+        noCourierOrdersMsg.style.display = 'none';
+
+        try {
+            const response = await fetch(`${API_URL}/courier/orders`, {
+                headers: { 'user-id': currentUser.userId.toString() }
+            });
+            if (!response.ok) {
+                const errData = await response.json();
+                throw new Error(errData.error || 'Kurye siparişleri yüklenemedi.');
+            }
+            const orders = await response.json();
+
+            courierOrdersListDiv.innerHTML = '';
+            if (!Array.isArray(orders) || orders.length === 0) {
+                noCourierOrdersMsg.style.display = 'block';
+                return;
+            }
+
+            orders.forEach(order => {
+                const orderCard = document.createElement('div');
+                orderCard.className = 'restaurant-panel-order-card'; // Re-using style
+                let statusClass = order.status ? order.status.toLowerCase().replace(/\s+/g, '-') : "pending";
+                const validStatusClasses = ["hazirlaniyor", "hazırlanıyor", "yolda", "teslim-edildi", "iptal-edildi", "pending", "preparing", "delivered", "cancelled", "kuryeye-verildi"];
+                if (!validStatusClasses.includes(statusClass)) statusClass = "pending";
+
+                orderCard.innerHTML = `
+                <div class="rp-order-header">
+                    <strong>Sipariş ID: ${order.id || order.orderId}</strong>
+                    <span>Durum: <span class="status ${statusClass}">${order.status}</span></span>
+                </div>
+                <div class="rp-order-body">
+                    <p><strong>Adres:</strong> ${order.delivery_address || 'Belirtilmedi'}</p>
+                    <p><strong>Restoran:</strong> ${order.restaurant_name}</p>
+                    <p><strong>Toplam:</strong> ${order.total_price ? order.total_price.toFixed(2) : 'N/A'}₺</p>
+                    <button class="update-status-btn" style="background-color: #28a745;" onclick="markOrderDeliveredByCourier(${order.id || order.orderId})">Teslim Edildi</button>
+                </div>
+                `;
+                courierOrdersListDiv.appendChild(orderCard);
+            });
+        } catch (err) {
+            console.error("Kurye siparişleri yükleme hatası:", err);
+            courierOrdersListDiv.innerHTML = `<p class="error">${err.message || 'Siparişler yüklenirken hata oluştu.'}</p>`;
+        }
+    }
+
+    async function markOrderDeliveredByCourier(orderId) {
+        if (!currentUser || currentUser.role !== 'courier') return;
+        try {
+            const response = await fetch(`${API_URL}/courier/order/${orderId}/delivered`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'user-id': currentUser.userId.toString()
+                }
+            });
+            const data = await response.json();
+            if (response.ok) {
+                alert('Sipariş teslim edildi olarak işaretlendi.');
+                loadCourierOrders(); // Refresh the list
+            } else {
+                alert(data.error || 'Teslimat güncellenirken hata oluştu.');
+            }
+        } catch (err) {
+            alert('Sunucuya bağlanırken hata oluştu.');
+        }
+    }
+
+
+  window.onload = () => {
+    checkLoginState();
+
+    const registerRoleSelect = document.getElementById('register-role');
+    const registerButton = document.getElementById('register-button'); // Use the button ID
+
+    if (registerRoleSelect && registerButton) {
+        registerRoleSelect.addEventListener('change', function() {
+            const role = this.value;
+            if (role === 'restaurant_owner') {
+                registerButton.disabled = true;
+                displayMessage('register-error', 'Restoran sahipleri için kayıt kapalıdır. Lütfen yönetici ile iletişime geçin.', false, 0); // No timeout
+            } else {
+                registerButton.disabled = false;
+                registerErrorEl.style.display = 'none';
+            }
+        });
+        // Initial check in case 'restaurant_owner' is pre-selected (though unlikely with current HTML)
+        if (registerRoleSelect.value === 'restaurant_owner') {
+            registerButton.disabled = true;
+            displayMessage('register-error', 'Restoran sahipleri için kayıt kapalıdır. Lütfen yönetici ile iletişime geçin.', false, 0);
+        }
+    }
+  };
+</script>
+</body>
+</html>
